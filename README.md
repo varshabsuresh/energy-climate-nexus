@@ -85,4 +85,4 @@ RWI is aggregated from settlement-level point data to administrative boundaries 
 
 ## Contact
 
-Questions or collaboration: open an issue or reach out via [LinkedIn](https://linkedin.com/in/YOUR_HANDLE).
+Questions or collaboration: open an issue or reach out via [LinkedIn]

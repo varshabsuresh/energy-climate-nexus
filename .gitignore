@@ -1,0 +1,15 @@
+# Large raster files — too big for GitHub, link to sources in README
+*.tif
+*.tiff
+
+# R session artifacts
+.Rhistory
+.RData
+.Rproj.user/
+
+# macOS
+.DS_Store
+
+# Outputs derived from private energy survey data
+outputs/newly_elec_pop_weighted_rwi.rds
+outputs/newly_electrified_with_context.csv

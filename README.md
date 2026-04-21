@@ -29,14 +29,14 @@ All other inputs (climate hazards, population, RWI, boundaries) are open source.
 
 | Dataset | Source | Licence |
 |---------|--------|---------|
-| Meta High Resolution Settlement Layer (population) | [HDX](https://data.humdata.org/dataset/highresolutionpopulationdensitymaps-sen) | CC BY |
-| Meta Relative Wealth Index | [HDX](https://data.humdata.org/dataset/relative-wealth-index) | CC BY |
-| WorldPop 2023 population (100m) | [WorldPop Hub](https://hub.worldpop.org) | CC BY |
-| Integrated climate hazard raster | [ThinkHazard / GIRI](https://thinkhazard.org) | Open |
-| Flood depth raster | [ThinkHazard](https://thinkhazard.org) | Open |
-| DRE Atlas settlements | [DREA Senegal](https://www.drea.gouv.sn/) | Public download |
-| World Bank Admin 0 boundaries | [World Bank](https://datacatalog.worldbank.org/dataset/world-bank-official-boundaries) | CC BY |
-| GADM Admin 1/2 boundaries | [GADM](https://gadm.org) | Non-commercial |
+| Meta High Resolution Settlement Layer (population) | [HDX](https://data.humdata.org/dataset/highresolutionpopulationdensitymaps-sen) | CC BY 4.0 |
+| Meta Relative Wealth Index | [HDX](https://data.humdata.org/dataset/relative-wealth-index) | CC BY 4.0 |
+| WorldPop 2023 population (100m) | [WorldPop Hub](https://hub.worldpop.org) | CC BY 4.0|
+| Integrated climate hazard raster | [World Bank Reproducible Research Repository (https://reproducibility.worldbank.org/catalog/186) | Modified BSD3 |
+| Flood depth raster | [HDX, UNOSAT] (https://data.humdata.org/dataset/unosat-live-web-map-inondations-au-senegal) | CC BY 4.0 |
+| DRE Atlas settlements | [DRE Atlas, World Bank Group](https://energydata.info/dataset/senegal-distributed-renewable-energy-dre) | CC BY 4.0 |
+| World Bank Admin 0 boundaries | [World Bank](https://datacatalog.worldbank.org/dataset/world-bank-official-boundaries) | CC BY 4.0 |
+| GADM Admin 1/2 boundaries | [World Bank Databank](https://datacatalog.worldbank.org/search/dataset/0038272/world-bank-official-boundaries) | CC BY 4.0 |
 
 ## Setup
 

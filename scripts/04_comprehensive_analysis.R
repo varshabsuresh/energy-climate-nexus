@@ -24,7 +24,7 @@
 # DATA SOURCES:
 #   - Meta RWI: https://data.humdata.org/dataset/relative-wealth-index
 #   - WorldPop 2023 (100m): https://hub.worldpop.org
-#   - Climate hazards (ThinkHazard/GIRI): https://thinkhazard.org
+#   - Climate hazards (World Bank Reproducible Research Repository): https://reproducibility.worldbank.org/catalog/186
 #   - World Bank boundaries: https://datacatalog.worldbank.org/dataset/world-bank-official-boundaries
 #   - GADM ADM2 boundaries: https://gadm.org
 #

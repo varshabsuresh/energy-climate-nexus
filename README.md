@@ -14,8 +14,9 @@ Analysing the intersection of rural electrification progress and climate risk in
 |------|-------------|
 | `scripts/03_poverty_analysis.R` | Population-weighted RWI analysis at ADM1/ADM2 level; poverty targeting assessment for newly electrified communities |
 | `scripts/04_comprehensive_analysis.R` | Combines RWI, climate hazard exposure, and electrification data at department level; produces the wealth × climate risk matrix |
-| `outputs/adm2_combined_analysis.csv` | Aggregated departmental dataset (RWI + hazard exposure) — no private data |
 | `data/README.md` | Data sources, licences, and download instructions |
+
+Running `scripts/04_comprehensive_analysis.R` produces `outputs/adm2_combined_analysis.csv` (aggregated departmental dataset, RWI + hazard exposure, no private data). This file is not committed to the repo — regenerate it locally after downloading the open-source inputs listed below.
 
 ## What is not included
 
@@ -44,7 +45,7 @@ All other inputs (climate hazards, population, RWI, boundaries) are open source.
 
 ```r
 install.packages(c(
-  "tidyverse", "sf", "terra", "here",
+  "tidyverse", "sf", "terra", "here", "exactextractr",
   "viridis", "patchwork", "knitr", "kableExtra"
 ))
 ```
@@ -83,6 +84,10 @@ Scripts 03 and 04 will run fully for all departmental-level analysis. Visualisat
 
 RWI is aggregated from settlement-level point data to administrative boundaries using population weighting, so that the resulting score reflects where people live rather than a simple spatial average. Climate hazard exposure is similarly population-weighted: for each department, the percentage reported is the share of the modelled population living in an exposed pixel, not the share of land area.
 
+## Licence
+
+Code in this repository is released under the MIT Licence (see `LICENSE`). Datasets retain their original licences — see the Data sources table above.
+
 ## Contact
 
-Questions or collaboration: open an issue or reach out via [LinkedIn]
+Questions or collaboration: open an issue or reach out via [LinkedIn](https://www.linkedin.com/in/varshasureshb)

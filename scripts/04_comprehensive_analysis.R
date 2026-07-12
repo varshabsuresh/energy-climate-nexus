@@ -50,6 +50,7 @@
 library(tidyverse)
 library(sf)
 library(terra)
+library(exactextractr)
 library(viridis)
 library(patchwork)
 library(here)
@@ -169,66 +170,70 @@ heat_raster    <- create_hazard_raster(hazard_parsed, "heat",    climate_hazard)
 flood_raster   <- create_hazard_raster(hazard_parsed, "flood",   climate_hazard)
 cyclone_raster <- create_hazard_raster(hazard_parsed, "cyclone", climate_hazard)
 
+# climate_hazard and population_raster are not on the same grid (confirmed
+# against real data: e.g. 5263x7419 vs 5262x7420 for Senegal) despite matching
+# nominal resolution, so align the binary hazard layers onto the population
+# grid before extraction. Nearest-neighbour preserves the 0/1 values exactly.
+drought_raster <- resample(drought_raster, population_raster, method = "near")
+heat_raster    <- resample(heat_raster,    population_raster, method = "near")
+flood_raster   <- resample(flood_raster,   population_raster, method = "near")
+cyclone_raster <- resample(cyclone_raster, population_raster, method = "near")
+
 # =============================================================================
 # 3. CALCULATE POPULATION-WEIGHTED HAZARD EXPOSURE AT ADM2
 # =============================================================================
 
 cat("\nCalculating climate hazard exposure at ADM2 level...\n")
-cat("(This loops over each department — may take a few minutes)\n")
+cat("(vectorised via exactextractr — one pass over all departments)\n")
 
+# NOTE: requires population_raster and the hazard rasters to share a grid —
+# same assumption the previous crop/mask implementation made implicitly by
+# concatenating values() vectors positionally. exact_extract() enforces this
+# explicitly: c() on mismatched grids errors instead of silently misaligning.
 calculate_adm2_hazards <- function(boundaries, hazard_rasters, pop_raster) {
 
   boundaries_proj <- st_transform(boundaries, crs(pop_raster))
-  results <- vector("list", nrow(boundaries_proj))
-  pb <- txtProgressBar(min = 0, max = nrow(boundaries_proj), style = 3)
 
-  for (i in seq_len(nrow(boundaries_proj))) {
-    poly <- boundaries_proj[i, ]
+  hazard_stack <- c(pop_raster, hazard_rasters$drought, hazard_rasters$heat,
+                     hazard_rasters$flood, hazard_rasters$cyclone)
+  names(hazard_stack) <- c("pop", "drought", "heat", "flood", "cyclone")
 
-    pop_crop     <- crop(pop_raster,            poly, mask = TRUE)
-    drought_crop <- crop(hazard_rasters$drought, poly, mask = TRUE)
-    heat_crop    <- crop(hazard_rasters$heat,    poly, mask = TRUE)
-    flood_crop   <- crop(hazard_rasters$flood,   poly, mask = TRUE)
-    cyclone_crop <- crop(hazard_rasters$cyclone, poly, mask = TRUE)
+  summarise_dept <- function(values_df) {
+    # a hazard value can be NA at population-covered edge cells introduced by
+    # resampling; treat those as not-exposed rather than letting NA propagate
+    # through sum() and silently blank out the whole department's percentage
+    values_df <- values_df %>%
+      filter(!is.na(pop), pop > 0) %>%
+      mutate(across(c(drought, heat, flood, cyclone), ~ replace_na(.x, 0)))
 
-    df <- data.frame(
-      pop     = values(pop_crop,     mat = FALSE),
-      drought = values(drought_crop, mat = FALSE),
-      heat    = values(heat_crop,    mat = FALSE),
-      flood   = values(flood_crop,   mat = FALSE),
-      cyclone = values(cyclone_crop, mat = FALSE)
-    ) %>%
-      filter(!is.na(pop), pop > 0)
-
-    if (nrow(df) > 0) {
-      total_pop <- sum(df$pop)
-      results[[i]] <- data.frame(
-        index               = i,
-        dept_population     = total_pop,
-        drought_exposed_pop = sum(df$pop[df$drought == 1]),
-        heat_exposed_pop    = sum(df$pop[df$heat    == 1]),
-        flood_exposed_pop   = sum(df$pop[df$flood   == 1]),
-        cyclone_exposed_pop = sum(df$pop[df$cyclone == 1]),
-        pct_drought  = 100 * sum(df$pop[df$drought == 1]) / total_pop,
-        pct_heat     = 100 * sum(df$pop[df$heat    == 1]) / total_pop,
-        pct_flood    = 100 * sum(df$pop[df$flood   == 1]) / total_pop,
-        pct_cyclone  = 100 * sum(df$pop[df$cyclone == 1]) / total_pop,
-        n_hazards    = sum(df$drought == 1 | df$heat == 1 |
-                             df$flood == 1 | df$cyclone == 1) / nrow(df)
-      )
-    } else {
-      results[[i]] <- data.frame(
-        index = i, dept_population = 0,
+    if (nrow(values_df) == 0) {
+      return(data.frame(
+        dept_population = 0,
         drought_exposed_pop = 0, heat_exposed_pop = 0,
-        flood_exposed_pop   = 0, cyclone_exposed_pop = 0,
+        flood_exposed_pop = 0, cyclone_exposed_pop = 0,
         pct_drought = 0, pct_heat = 0, pct_flood = 0, pct_cyclone = 0,
         n_hazards = 0
-      )
+      ))
     }
-    setTxtProgressBar(pb, i)
+
+    total_pop <- sum(values_df$pop)
+    data.frame(
+      dept_population     = total_pop,
+      drought_exposed_pop = sum(values_df$pop[values_df$drought == 1]),
+      heat_exposed_pop    = sum(values_df$pop[values_df$heat    == 1]),
+      flood_exposed_pop   = sum(values_df$pop[values_df$flood   == 1]),
+      cyclone_exposed_pop = sum(values_df$pop[values_df$cyclone == 1]),
+      pct_drought  = 100 * sum(values_df$pop[values_df$drought == 1]) / total_pop,
+      pct_heat     = 100 * sum(values_df$pop[values_df$heat    == 1]) / total_pop,
+      pct_flood    = 100 * sum(values_df$pop[values_df$flood   == 1]) / total_pop,
+      pct_cyclone  = 100 * sum(values_df$pop[values_df$cyclone == 1]) / total_pop,
+      n_hazards    = sum(values_df$drought == 1 | values_df$heat == 1 |
+                           values_df$flood == 1 | values_df$cyclone == 1) / nrow(values_df)
+    )
   }
-  close(pb)
-  bind_rows(results)
+
+  exact_extract(hazard_stack, boundaries_proj,
+                fun = summarise_dept, summarize_df = TRUE, progress = TRUE)
 }
 
 adm2_hazards <- calculate_adm2_hazards(
@@ -248,7 +253,7 @@ cat("\nCombining all datasets...\n")
 
 adm2_combined <- adm2_boundaries %>%
   left_join(adm2_rwi_csv, by = c("NAM_1", "NAM_2")) %>%
-  bind_cols(adm2_hazards %>% select(-index)) %>%
+  bind_cols(adm2_hazards) %>%
   mutate(
     wealth_category = case_when(
       is.na(pop_weighted_rwi)                                    ~ "No RWI Data",

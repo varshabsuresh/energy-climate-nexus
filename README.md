@@ -1,4 +1,4 @@
-# Energy Access and Climate Vulnerability — Senegal
+# Energy Access and Climate Vulnerability in Senegal
 
 Analysing the intersection of rural electrification progress and climate risk in Senegal, using panel data from 2024–2025 energy surveys, open-source climate hazard rasters, and Meta's Relative Wealth Index.
 

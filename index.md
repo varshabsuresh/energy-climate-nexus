@@ -19,13 +19,13 @@ Population-weighted share of Senegal's population living in an exposed pixel, by
 
 ## Wealth by department
 
-![Population-weighted RWI by department](assets/img/rwi_by_department.png)
+<img src="assets/img/rwi_by_department.png" alt="Population-weighted RWI by department" width="500">
 
 Wealth (Meta's Relative Wealth Index, population-weighted to the department level) is highest around Dakar and the northwest coast, and lowest across the central and southeastern interior.
 
 ## Climate risk by department
 
-![Climate risk by department](assets/img/climate_risk_by_department.png)
+<img src="assets/img/climate_risk_by_department.png" alt="Climate risk by department" width="500">
 
 Risk here is the maximum of the four population-weighted hazard exposure percentages (drought, heat, flood, cyclone), thresholded at 33% / 66%. High-risk departments cluster in the north (Sahelian drought/heat belt) and the east.
 

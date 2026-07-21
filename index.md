@@ -1,4 +1,4 @@
-# Energy Access & Climate Vulnerability
+# Assessing Energy Access & Climate Vulnerability
 
 Individual research mapping the intersection of electrification, wealth, and climate hazard exposure across African countries, using open-source geospatial data (satellite nighttime lights, climate hazard rasters, census and survey data).
 
